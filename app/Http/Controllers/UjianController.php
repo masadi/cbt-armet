@@ -26,9 +26,12 @@ class UjianController extends Controller
                 $query->withWhereHas('anggota', function($query){
                     $query->where('peserta_didik_id', request()->user()->peserta_didik_id);
                 });
-            })->with(['mata_pelajaran', 'jadwal', 'soal_ujian.ujian_siswa' => function($query){
-                $query->where('user_id', request()->user()->id);
-            }])->orderBy('tanggal')->orderBy('jam_ke')->get(),
+            })->withWhereHas('soal_ujian', function($query){
+                $query->where('status', 1);
+                $query->with(['ujian_siswa' => function($query){
+                    $query->where('user_id', request()->user()->id);
+                }]);
+            })->with(['mata_pelajaran', 'jadwal'])->orderBy('tanggal')->orderBy('jam_ke')->get(),
         ];
         return response()->json($data);
     }
